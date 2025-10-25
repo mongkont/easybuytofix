@@ -1,0 +1,191 @@
+/* Custom CSS for Django Admin */
+
+/* Avatar styling with object-fit: cover - detail view (larger and rectangular) */
+.avatar-preview img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+}
+
+/* User profile inline styling */
+.inline-group .form-row .avatar-preview {
+    display: block;
+    margin-top: 10px;
+}
+
+/* Admin form styling - detail view */
+.form-row .field-avatar img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Profile list styling */
+.field-avatar_preview img {
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+}
+
+/* Avatar in listview - make it smaller and circular */
+#result_list .field-avatar_preview img {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* User listview avatar styling */
+#result_list .field-get_avatar_preview img {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Force all avatar images in listview to be circular and small */
+#result_list td img[src*="avatars/"] {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Specific targeting for profile picture column */
+#result_list .field-avatar_preview,
+#result_list .field-get_avatar_preview {
+    text-align: center !important;
+    width: 60px !important;
+}
+
+#result_list .field-avatar_preview img,
+#result_list .field-get_avatar_preview img {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .avatar-preview img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    .field-avatar_preview img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+}
+
+/* Summernote styling for full width */
+.django-summernote-widget {
+    display: block !important;
+    width: 100% !important;
+}
+
+.django-summernote-widget .note-editor {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Form field styling */
+.field-phone_number input {
+    width: 100%;
+    max-width: 300px;
+}
+
+.field-bio textarea {
+    width: 100%;
+    min-height: 100px;
+}
+
+.field-address textarea {
+    width: 100%;
+    min-height: 80px;
+}
+
+/* Additional targeting for listview avatars - more specific selectors */
+#changelist .results table td img {
+    max-width: 30px !important;
+    max-height: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Target specific avatar columns in changelist */
+#changelist .results table .field-avatar_preview,
+#changelist .results table .field-get_avatar_preview {
+    width: 60px !important;
+    text-align: center !important;
+}
+
+#changelist .results table .field-avatar_preview img,
+#changelist .results table .field-get_avatar_preview img {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Force all images in result list to be small and circular */
+#result_list img {
+    max-width: 30px !important;
+    max-height: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Detail view avatar styling - larger and rectangular */
+#content .avatar-preview img,
+.change-form .avatar-preview img,
+.form-row .avatar-preview img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* Ensure detail view avatars are not circular */
+#content .avatar-preview img,
+.change-form .avatar-preview img,
+.form-row .avatar-preview img {
+    border-radius: 8px !important;
+}
