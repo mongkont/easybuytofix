@@ -47,11 +47,12 @@ def delete_old_avatar_on_update(sender, instance, created, **kwargs):
                 # Delete old avatar file
                 if default_storage.exists(old_instance.avatar.name):
                     default_storage.delete(old_instance.avatar.name)
+                    print(f"✅ ลบรูปเก่าอัตโนมัติ: {old_instance.avatar.name}")
         except UserProfile.DoesNotExist:
             pass
         except Exception as e:
             # Log error but don't prevent save
-            print(f"Error deleting old avatar: {e}")
+            print(f"❌ Error deleting old avatar: {e}")
     
     # Fix permissions for new avatar
     if instance.avatar and instance.avatar.name:

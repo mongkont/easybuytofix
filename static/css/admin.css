@@ -170,6 +170,83 @@
     margin: 0 auto !important;
 }
 
+/* Category image styling - 1:1 aspect ratio */
+.category-image-preview img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* OG Image styling - 16:9 aspect ratio */
+.og-image-preview img {
+    width: 320px !important;
+    height: 180px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* Category image in listview - square */
+#result_list .field-image_preview img {
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Force category images to display properly */
+#content .category-image-preview img,
+.change-form .category-image-preview img,
+.form-row .category-image-preview img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* Ensure category images load properly */
+.category-image-preview {
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+.category-image-preview img {
+    max-width: 200px !important;
+    max-height: 200px !important;
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* Fix image display in admin forms */
+.form-row .field-image_with_delete_button,
+.form-row .field-og_image_with_delete_button {
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+.form-row .field-image_with_delete_button .category-image-preview,
+.form-row .field-og_image_with_delete_button .category-image-preview {
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
 /* Detail view avatar styling - larger and rectangular */
 #content .avatar-preview img,
 .change-form .avatar-preview img,

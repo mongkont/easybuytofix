@@ -31,6 +31,7 @@ class UserProfileInline(admin.StackedInline):
             'classes': ('collapse',)
         }),
     )
+    actions = ['delete_avatar']
     
     def get_readonly_fields(self, request, obj=None):
         """Make created_by and updated_by readonly"""
@@ -114,6 +115,33 @@ class UserProfileInline(admin.StackedInline):
             return obj.updated_by.username
         return "-"
     updated_by_display.short_description = 'ผู้แก้ไข'
+    
+    def delete_avatar(self, request, queryset):
+        """Delete avatar for selected profiles"""
+        from django.contrib import messages
+        from django.core.files.storage import default_storage
+        
+        deleted_count = 0
+        for profile in queryset:
+            if profile.avatar:
+                try:
+                    # Delete file from storage
+                    if default_storage.exists(profile.avatar.name):
+                        default_storage.delete(profile.avatar.name)
+                    
+                    # Clear avatar field
+                    profile.avatar = None
+                    profile.save()
+                    deleted_count += 1
+                except Exception as e:
+                    messages.error(request, f"Error deleting avatar for {profile.user.username}: {e}")
+        
+        if deleted_count > 0:
+            messages.success(request, f"ลบรูปโปรไฟล์ {deleted_count} รายการเรียบร้อยแล้ว")
+        else:
+            messages.warning(request, "ไม่มีรูปโปรไฟล์ที่สามารถลบได้")
+    
+    delete_avatar.short_description = "ลบรูปโปรไฟล์"
 
 
 class UserAdmin(BaseUserAdmin):
@@ -134,7 +162,8 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'full_name', 'phone_number', 'avatar_preview', 'created_by_display', 'updated_by_display', 'created_at_thai')
     list_filter = ('created_at', 'updated_at', 'user__is_active', 'user__is_staff')
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'phone_number')
-    readonly_fields = ('created_at_thai', 'updated_at_thai', 'created_by_display', 'updated_by_display', 'avatar_preview')
+    readonly_fields = ('created_at_thai', 'updated_at_thai', 'created_by_display', 'updated_by_display', 'avatar_preview', 'avatar_with_delete_button')
+    actions = ['delete_avatar']
     
     class Media:
         css = {
@@ -143,7 +172,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('ข้อมูลผู้ใช้', {
-            'fields': ('user', 'avatar_preview')
+            'fields': ('user', 'avatar_with_delete_button')
         }),
         ('จัดการรูปโปรไฟล์', {
             'fields': ('avatar',),
@@ -162,6 +191,40 @@ class UserProfileAdmin(admin.ModelAdmin):
         }),
     )
     
+    def get_urls(self):
+        """Add custom URLs for avatar management"""
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path('<int:object_id>/delete-avatar/', self.delete_avatar_view, name='accounts_userprofile_delete_avatar'),
+        ]
+        return custom_urls + urls
+    
+    def delete_avatar_view(self, request, object_id):
+        """Delete avatar for specific profile"""
+        from django.shortcuts import get_object_or_404, redirect
+        from django.contrib import messages
+        from django.core.files.storage import default_storage
+        
+        profile = get_object_or_404(UserProfile, pk=object_id)
+        
+        if profile.avatar:
+            try:
+                # Delete file from storage
+                if default_storage.exists(profile.avatar.name):
+                    default_storage.delete(profile.avatar.name)
+                
+                # Clear avatar field
+                profile.avatar = None
+                profile.save()
+                messages.success(request, f"ลบรูปโปรไฟล์ของ {profile.user.username} เรียบร้อยแล้ว")
+            except Exception as e:
+                messages.error(request, f"Error deleting avatar: {e}")
+        else:
+            messages.warning(request, "ไม่มีรูปโปรไฟล์ที่สามารถลบได้")
+        
+        return redirect(f'/admin/accounts/userprofile/{object_id}/change/')
+    
     def full_name(self, obj):
         """Display user's full name"""
         return obj.full_name
@@ -176,6 +239,26 @@ class UserProfileAdmin(admin.ModelAdmin):
         return "ไม่มีรูป"
     avatar_preview.short_description = 'รูปโปรไฟล์'
     avatar_preview.allow_tags = True
+    
+    def avatar_with_delete_button(self, obj):
+        """Display avatar preview with delete button for detail view"""
+        if obj.avatar:
+            delete_url = f'/admin/accounts/userprofile/{obj.pk}/delete-avatar/'
+            return mark_safe(
+                f'''
+                <div class="avatar-preview">
+                    <img src="{obj.avatar.url}" alt="Avatar" />
+                    <br>
+                    <a href="{delete_url}" class="button" style="margin-top: 10px; background: #dc3545; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px;" 
+                       onclick="return confirm('คุณแน่ใจหรือไม่ที่จะลบรูปโปรไฟล์นี้?')">
+                        ลบรูป
+                    </a>
+                </div>
+                '''
+            )
+        return "ไม่มีรูป"
+    avatar_with_delete_button.short_description = 'รูปโปรไฟล์'
+    avatar_with_delete_button.allow_tags = True
     
     def created_by_display(self, obj):
         """Display creator name"""
@@ -257,6 +340,33 @@ class UserProfileAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.updated_by = request.user
         super().save_model(request, obj, form, change)
+    
+    def delete_avatar(self, request, queryset):
+        """Delete avatar for selected profiles"""
+        from django.contrib import messages
+        from django.core.files.storage import default_storage
+        
+        deleted_count = 0
+        for profile in queryset:
+            if profile.avatar:
+                try:
+                    # Delete file from storage
+                    if default_storage.exists(profile.avatar.name):
+                        default_storage.delete(profile.avatar.name)
+                    
+                    # Clear avatar field
+                    profile.avatar = None
+                    profile.save()
+                    deleted_count += 1
+                except Exception as e:
+                    messages.error(request, f"Error deleting avatar for {profile.user.username}: {e}")
+        
+        if deleted_count > 0:
+            messages.success(request, f"ลบรูปโปรไฟล์ {deleted_count} รายการเรียบร้อยแล้ว")
+        else:
+            messages.warning(request, "ไม่มีรูปโปรไฟล์ที่สามารถลบได้")
+    
+    delete_avatar.short_description = "ลบรูปโปรไฟล์"
     
     def get_readonly_fields(self, request, obj=None):
         """Make created_by readonly for existing objects"""
