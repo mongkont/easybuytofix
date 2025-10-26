@@ -147,15 +147,11 @@ class Manual(models.Model):
         help_text=_("เลือกกลุ่มที่สามารถเห็นคู่มือนี้")
     )
     
-    # Ordering
-    order_before = models.ForeignKey(
-        'self',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='items_after',
-        verbose_name=_("อยู่ก่อน"),
-        help_text=_("เลือกคู่มือที่จะอยู่ก่อนหน้านี้ หรือปล่อยว่างเพื่ออยู่ท้ายสุด")
+    # Ordering - Simple order field
+    order = models.PositiveIntegerField(
+        _("ลำดับ"),
+        default=0,
+        help_text=_("ลำดับการแสดงผล (ตัวเลขน้อย = แสดงก่อน)")
     )
     
     # SEO
@@ -206,7 +202,7 @@ class Manual(models.Model):
     class Meta:
         verbose_name = _("คู่มือการใช้งาน")
         verbose_name_plural = _("คู่มือการใช้งาน")
-        ordering = ['category__order', 'category__name', 'title']
+        ordering = ['category__order', 'category__name', 'order', 'title']
 
     def __str__(self):
         return self.title

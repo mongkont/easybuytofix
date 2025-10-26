@@ -112,11 +112,12 @@ class ManualAdmin(SummernoteModelAdmin):
     
     summernote_fields = ('content',)
     
-    list_display = ('title', 'category', 'order_display', 'is_public', 'visible_groups_display', 'is_active', 'created_by_display', 'updated_by_display', 'created_at_thai')
+    list_display = ('title', 'category', 'order', 'is_public', 'visible_groups_display', 'is_active', 'created_by_display', 'updated_by_display', 'created_at_thai')
     list_filter = ('category', 'is_public', 'is_active', 'visible_to_groups', 'created_at', 'updated_at')
     search_fields = ('title', 'slug', 'content', 'seo_title', 'seo_description')
     readonly_fields = ('created_at_thai', 'updated_at_thai', 'created_by_display', 'updated_by_display')
-    ordering = ('category__order', 'category__name', 'title')
+    ordering = ('category__order', 'category__name', 'order', 'title')
+    
     prepopulated_fields = {'slug': ('title',)}
     filter_horizontal = ('visible_to_groups',)
     
@@ -130,8 +131,8 @@ class ManualAdmin(SummernoteModelAdmin):
             'fields': ('title', 'slug', 'category', 'content')
         }),
         ('การแสดงผล', {
-            'fields': ('is_public', 'visible_to_groups', 'order_before'),
-            'description': 'กำหนดว่าใครสามารถเห็นคู่มือนี้ได้ และลำดับการแสดงผล'
+            'fields': ('is_public', 'visible_to_groups', 'order'),
+            'description': 'กำหนดว่าใครสามารถเห็นคู่มือนี้ได้ และลำดับการแสดงผล (ตัวเลขน้อย = แสดงก่อน)'
         }),
         ('SEO Optimization', {
             'fields': ('seo_title', 'seo_description'),
@@ -144,12 +145,6 @@ class ManualAdmin(SummernoteModelAdmin):
         }),
     )
     
-    def order_display(self, obj):
-        """Display order information"""
-        if obj.order_before:
-            return f"อยู่ก่อน: {obj.order_before.title}"
-        return "อยู่ท้ายสุด"
-    order_display.short_description = 'ลำดับ'
     
     def visible_groups_display(self, obj):
         """Display visible groups"""
@@ -221,13 +216,3 @@ class ManualAdmin(SummernoteModelAdmin):
             readonly.append('created_by')
         return readonly
     
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """Customize order_before dropdown"""
-        if db_field.name == "order_before":
-            # Get current manual if editing
-            if hasattr(request, 'resolver_match') and request.resolver_match.kwargs.get('object_id'):
-                current_manual_id = request.resolver_match.kwargs['object_id']
-                kwargs["queryset"] = Manual.objects.exclude(pk=current_manual_id).filter(is_active=True)
-            else:
-                kwargs["queryset"] = Manual.objects.filter(is_active=True)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
