@@ -17,6 +17,13 @@ def category_image_upload_path(instance, filename):
     return os.path.join('categories', filename)
 
 
+def brand_logo_upload_path(instance, filename):
+    """Generate upload path for brand logos"""
+    ext = filename.split('.')[-1]
+    filename = f"brand_{instance.pk}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{ext}"
+    return os.path.join('brands', filename)
+
+
 def custom_slugify(value):
     """Create slug that supports Thai characters"""
     if not value:
@@ -204,6 +211,166 @@ class Category(models.Model):
             try:
                 from PIL import Image
                 with self.image.open() as img:
+                    pil_img = Image.open(img)
+                    return f"{pil_img.width}x{pil_img.height}"
+            except:
+                return "ไม่สามารถอ่านขนาดได้"
+        return "ไม่มีรูป"
+    
+    @property
+    def og_image_size(self):
+        """Get OG image dimensions if available"""
+        if self.og_image:
+            try:
+                from PIL import Image
+                with self.og_image.open() as img:
+                    pil_img = Image.open(img)
+                    return f"{pil_img.width}x{pil_img.height}"
+            except:
+                return "ไม่สามารถอ่านขนาดได้"
+        return "ไม่มีรูป"
+    
+    @property
+    def seo_title_display(self):
+        """Get SEO title or fallback to name"""
+        return self.seo_title if self.seo_title else self.name
+    
+    @property
+    def og_title_display(self):
+        """Get OG title or fallback to SEO title or name"""
+        return self.og_title if self.og_title else (self.seo_title if self.seo_title else self.name)
+
+
+class Brand(models.Model):
+    """Brand model"""
+    name = models.CharField(
+        _("ชื่อแบรนด์"),
+        max_length=100,
+        unique=True,
+        help_text=_("ชื่อแบรนด์สินค้า")
+    )
+    slug = models.CharField(
+        _("Slug"),
+        max_length=255,
+        unique=True,
+        blank=True,
+        help_text=_("URL-friendly version of the name (auto-generated or manual)")
+    )
+    description = models.TextField(
+        _("รายละเอียดแบรนด์"),
+        blank=True,
+        null=True,
+        help_text=_("รายละเอียดเพิ่มเติมเกี่ยวกับแบรนด์")
+    )
+    logo = models.ImageField(
+        _("Logo แบรนด์"),
+        upload_to=brand_logo_upload_path,
+        blank=True,
+        null=True,
+        help_text=_("อัปโหลดโลโก้แบรนด์ (อัตราส่วน 1:1)")
+    )
+    alt_text = models.CharField(
+        _("Alt Text"),
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text=_("ข้อความอธิบายโลโก้สำหรับผู้ใช้ที่มองไม่เห็น")
+    )
+    
+    # SEO Fields
+    seo_title = models.CharField(
+        _("SEO Title"),
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text=_("ชื่อหน้าเว็บสำหรับ SEO (แนะนำไม่เกิน 100 ตัวอักษร)")
+    )
+    seo_description = models.TextField(
+        _("SEO Description"),
+        blank=True,
+        null=True,
+        help_text=_("คำอธิบายสำหรับ SEO (แนะนำไม่เกิน 200 ตัวอักษร)")
+    )
+    
+    # OG (Open Graph) Fields
+    og_image = models.ImageField(
+        _("OG Image"),
+        upload_to=brand_logo_upload_path,
+        blank=True,
+        null=True,
+        help_text=_("รูปสำหรับแชร์ใน Social Media (ขนาด 1200x630px - อัตราส่วน 16:9)")
+    )
+    og_title = models.CharField(
+        _("OG Title"),
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text=_("ชื่อสำหรับแชร์ใน Social Media (แนะนำไม่เกิน 100 ตัวอักษร)")
+    )
+    og_description = models.TextField(
+        _("OG Description"),
+        blank=True,
+        null=True,
+        help_text=_("คำอธิบายสำหรับแชร์ใน Social Media (แนะนำไม่เกิน 200 ตัวอักษร)")
+    )
+    
+    is_active = models.BooleanField(
+        _("ใช้งานได้"),
+        default=True,
+        help_text=_("สถานะการใช้งานของแบรนด์")
+    )
+    created_at = models.DateTimeField(
+        _("วันที่สร้าง"),
+        auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        _("วันที่แก้ไข"),
+        auto_now=True
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='created_brands',
+        blank=True,
+        null=True,
+        verbose_name=_("ผู้สร้าง")
+    )
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name='updated_brands',
+        blank=True,
+        null=True,
+        verbose_name=_("ผู้แก้ไข")
+    )
+
+    class Meta:
+        verbose_name = _("แบรนด์")
+        verbose_name_plural = _("แบรนด์")
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        """Auto-generate slug from name if not provided"""
+        if not self.slug:
+            self.slug = custom_slugify(self.name)
+            # Ensure uniqueness
+            original_slug = self.slug
+            counter = 1
+            while Brand.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
+
+    @property
+    def logo_size(self):
+        """Get logo dimensions if available"""
+        if self.logo:
+            try:
+                from PIL import Image
+                with self.logo.open() as img:
                     pil_img = Image.open(img)
                     return f"{pil_img.width}x{pil_img.height}"
             except:

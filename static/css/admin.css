@@ -266,3 +266,69 @@
 .form-row .avatar-preview img {
     border-radius: 8px !important;
 }
+
+/* Brand logo styling - 1:1 aspect ratio */
+.brand-logo-preview img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* Brand logo in listview - square */
+#result_list .field-logo_preview img {
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 1px solid #ddd !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* Force brand logos to display properly */
+#content .brand-logo-preview img,
+.change-form .brand-logo-preview img,
+.form-row .brand-logo-preview img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* Ensure brand logos load properly */
+.brand-logo-preview {
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+.brand-logo-preview img {
+    max-width: 200px !important;
+    max-height: 200px !important;
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 2px solid #ddd !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+/* Fix image display in admin forms */
+.form-row .field-logo_with_delete_button,
+.form-row .field-og_image_with_delete_button {
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
+.form-row .field-logo_with_delete_button .brand-logo-preview,
+.form-row .field-og_image_with_delete_button .brand-logo-preview {
+    display: block !important;
+    margin: 10px 0 !important;
+}
