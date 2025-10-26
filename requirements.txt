@@ -5,3 +5,4 @@ django-storages==1.14.4
 boto3==1.35.36
 Pillow==10.4.0
 pytz==2024.1
+unidecode==1.4.0

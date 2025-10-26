@@ -3,6 +3,9 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 import os
 from datetime import datetime
+from django.utils.text import slugify
+import re
+from unidecode import unidecode
 
 User = get_user_model()
 
@@ -14,6 +17,63 @@ def category_image_upload_path(instance, filename):
     return os.path.join('categories', filename)
 
 
+def custom_slugify(value):
+    """Create slug that supports Thai characters"""
+    if not value:
+        return ''
+    
+    # Use unidecode to convert Thai to readable text
+    decoded = unidecode(value)
+    
+    # Clean up the result
+    result = re.sub(r'[^\w\s-]', '', decoded)  # Remove special characters
+    result = re.sub(r'[-\s]+', '-', result)    # Replace spaces and multiple dashes with single dash
+    result = result.strip('-')                 # Remove leading/trailing dashes
+    
+    return result.lower()
+
+
+def thai_slugify(text):
+    """Convert Thai text to URL-friendly slug"""
+    if not text:
+        return ''
+    
+    # Thai character mapping
+    thai_map = {
+        'ก': 'k', 'ข': 'kh', 'ฃ': 'kh', 'ค': 'kh', 'ฅ': 'kh', 'ฆ': 'kh',
+        'ง': 'ng', 'จ': 'ch', 'ฉ': 'ch', 'ช': 'ch', 'ซ': 's', 'ฌ': 'ch',
+        'ญ': 'y', 'ด': 'd', 'ต': 't', 'ถ': 'th', 'ท': 'th', 'ธ': 'th',
+        'น': 'n', 'บ': 'b', 'ป': 'p', 'ผ': 'ph', 'ฝ': 'f', 'พ': 'ph',
+        'ฟ': 'f', 'ภ': 'ph', 'ม': 'm', 'ย': 'y', 'ร': 'r', 'ล': 'l',
+        'ว': 'w', 'ศ': 's', 'ษ': 's', 'ส': 's', 'ห': 'h', 'ฬ': 'l',
+        'อ': '', 'ฮ': 'h',
+        'ะ': 'a', 'ั': 'a', 'า': 'a', 'ำ': 'am', 'ิ': 'i', 'ี': 'i',
+        'ึ': 'ue', 'ื': 'ue', 'ุ': 'u', 'ู': 'u', 'เ': 'e', 'แ': 'ae',
+        'โ': 'o', 'ใ': 'ai', 'ไ': 'ai', '็': '', '่': '', '้': '',
+        '๊': '', '๋': '', '์': '', 'ํ': '', '๎': '', '๏': '', '๐': '0',
+        '๑': '1', '๒': '2', '๓': '3', '๔': '4', '๕': '5',
+        '๖': '6', '๗': '7', '๘': '8', '๙': '9'
+    }
+    
+    # Convert Thai characters
+    result = ''
+    for char in text:
+        if char in thai_map:
+            result += thai_map[char]
+        elif char.isalnum():
+            result += char
+        elif char in ' -_':
+            result += '-'
+        else:
+            result += ''
+    
+    # Clean up the result
+    result = re.sub(r'-+', '-', result)  # Replace multiple dashes with single dash
+    result = result.strip('-')  # Remove leading/trailing dashes
+    
+    return result.lower()
+
+
 class Category(models.Model):
     """Product category model"""
     name = models.CharField(
@@ -21,6 +81,13 @@ class Category(models.Model):
         max_length=100,
         unique=True,
         help_text=_("ชื่อหมวดหมู่สินค้า")
+    )
+    slug = models.CharField(
+        _("Slug"),
+        max_length=255,
+        unique=True,
+        blank=True,
+        help_text=_("URL-friendly version of the name (auto-generated or manual)")
     )
     description = models.TextField(
         _("รายละเอียดหมวดหมู่"),
@@ -117,6 +184,18 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        """Auto-generate slug from name if not provided"""
+        if not self.slug:
+            self.slug = custom_slugify(self.name)
+            # Ensure uniqueness
+            original_slug = self.slug
+            counter = 1
+            while Category.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
 
     @property
     def image_size(self):

@@ -15,11 +15,12 @@ from django.core.files.storage import default_storage
 class CategoryAdmin(admin.ModelAdmin):
     """Admin for Category model"""
     
-    list_display = ('name', 'description_preview', 'image_preview', 'image_size_display', 'seo_title_display', 'is_active', 'created_by_display', 'updated_by_display', 'created_at_thai')
+    list_display = ('name', 'slug', 'description_preview', 'image_preview', 'image_size_display', 'seo_title_display', 'is_active', 'created_by_display', 'updated_by_display', 'created_at_thai')
     list_filter = ('is_active', 'created_at', 'updated_at')
-    search_fields = ('name', 'description', 'seo_title', 'seo_description')
+    search_fields = ('name', 'slug', 'description', 'seo_title', 'seo_description')
     readonly_fields = ('created_at_thai', 'updated_at_thai', 'created_by_display', 'updated_by_display', 'image_preview', 'image_size_display', 'og_image_preview', 'og_image_size_display', 'image_with_delete_button', 'og_image_with_delete_button')
     ordering = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
     actions = ['delete_category_images']
     
     class Media:
@@ -29,7 +30,7 @@ class CategoryAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('ข้อมูลหมวดหมู่', {
-            'fields': ('name', 'description', 'is_active')
+            'fields': ('name', 'slug', 'description', 'is_active')
         }),
         ('รูปหมวดหมู่', {
             'fields': ('image_with_delete_button', 'image', 'image_size_display', 'alt_text')
@@ -91,6 +92,13 @@ class CategoryAdmin(admin.ModelAdmin):
         """Display OG image size"""
         return obj.og_image_size
     og_image_size_display.short_description = 'ขนาด OG Image'
+    
+    def slug_display(self, obj):
+        """Display slug with auto-generation info"""
+        if obj.slug:
+            return f"{obj.slug} (auto-generated)"
+        return "จะสร้างอัตโนมัติเมื่อบันทึก"
+    slug_display.short_description = 'Slug'
     
     def image_with_delete_button(self, obj):
         """Display image preview with delete button for detail view"""
