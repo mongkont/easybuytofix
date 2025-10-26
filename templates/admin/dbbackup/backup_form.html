@@ -1,0 +1,153 @@
+{% extends "admin/base.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}Backup Database | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:dbbackup_backuphistory_changelist' %}">ประวัติการ Backup</a>
+&rsaquo; {% trans 'Backup Database' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module aligned">
+    <h2>Backup Database</h2>
+    
+    <div class="form-row">
+        <div class="field-box">
+            <label>PostgreSQL Version:</label>
+            <strong>{{ postgresql_version }}</strong>
+        </div>
+    </div>
+    
+    <form method="post" id="backup-form">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="field-box">
+                <label for="id_environment">Environment:</label>
+                <select name="environment" id="id_environment" required>
+                    <option value="">-- เลือก Environment --</option>
+                    <option value="local">Local</option>
+                    <option value="production">Production</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="field-box">
+                <label for="id_notes">หมายเหตุ:</label>
+                <textarea name="notes" id="id_notes" rows="3" cols="50" placeholder="หมายเหตุเพิ่มเติม (ไม่บังคับ)"></textarea>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="field-box">
+                <button type="submit" id="backup-btn" class="default">เริ่ม Backup</button>
+                <a href="{% url 'admin:dbbackup_backuphistory_changelist' %}" class="button">ยกเลิก</a>
+            </div>
+        </div>
+    </form>
+    
+    <div id="progress-container" style="display: none; margin-top: 20px;">
+        <h3>ความคืบหน้า</h3>
+        <div class="progress-bar" style="width: 100%; background-color: #f0f0f0; border-radius: 3px; height: 30px;">
+            <div id="progress-fill" style="width: 0%; background-color: #4CAF50; height: 30px; border-radius: 3px; text-align: center; color: white; line-height: 30px;">0%</div>
+        </div>
+        <div id="progress-message" style="margin-top: 10px;"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('backup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const environment = document.getElementById('id_environment').value;
+    const notes = document.getElementById('id_notes').value;
+    const backupBtn = document.getElementById('backup-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const progressMessage = document.getElementById('progress-message');
+    
+    if (!environment) {
+        alert('กรุณาเลือก Environment');
+        return;
+    }
+    
+    // Disable button and show progress
+    backupBtn.disabled = true;
+    backupBtn.textContent = 'กำลัง Backup...';
+    progressContainer.style.display = 'block';
+    progressMessage.textContent = 'กำลังเริ่ม backup...';
+    
+    // Submit form
+    fetch('/admin/dbbackup/backuphistory/backup/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: new URLSearchParams({
+            'environment': environment,
+            'notes': notes
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            progressMessage.textContent = 'Backup เริ่มแล้ว กรุณารอสักครู่...';
+            pollProgress(data.backup_id);
+        } else {
+            alert('เกิดข้อผิดพลาด: ' + data.error);
+            resetForm();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('เกิดข้อผิดพลาดในการส่งคำขอ');
+        resetForm();
+    });
+});
+
+function pollProgress(backupId) {
+    const progressFill = document.getElementById('progress-fill');
+    const progressMessage = document.getElementById('progress-message');
+    
+    const interval = setInterval(() => {
+        fetch(`/admin/dbbackup/backuphistory/progress/${backupId}/`)
+        .then(response => response.json())
+        .then(data => {
+            progressFill.style.width = data.progress + '%';
+            progressFill.textContent = data.progress + '%';
+            progressMessage.textContent = data.message || '';
+            
+            if (data.status === 'completed') {
+                clearInterval(interval);
+                progressMessage.textContent = 'Backup เสร็จสิ้นแล้ว!';
+                setTimeout(() => {
+                    window.location.href = '/admin/dbbackup/backuphistory/';
+                }, 2000);
+            } else if (data.status === 'failed') {
+                clearInterval(interval);
+                progressMessage.textContent = 'Backup ล้มเหลว: ' + data.message;
+                resetForm();
+            }
+        })
+        .catch(error => {
+            console.error('Error polling progress:', error);
+        });
+    }, 1000);
+}
+
+function resetForm() {
+    const backupBtn = document.getElementById('backup-btn');
+    const progressContainer = document.getElementById('progress-container');
+    
+    backupBtn.disabled = false;
+    backupBtn.textContent = 'เริ่ม Backup';
+    progressContainer.style.display = 'none';
+}
+</script>
+{% endblock %}

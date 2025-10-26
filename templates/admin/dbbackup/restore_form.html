@@ -1,0 +1,194 @@
+{% extends "admin/base.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}Restore Database | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:dbbackup_backuphistory_changelist' %}">ประวัติการ Backup</a>
+&rsaquo; {% trans 'Restore Database' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module aligned">
+    <h2>Restore Database</h2>
+    
+    <div class="form-row" style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <strong style="color: #856404;">⚠️ คำเตือน:</strong>
+        <ul style="margin: 10px 0; color: #856404;">
+            <li>การ restore จะเขียนทับข้อมูลในฐานข้อมูลปัจจุบัน</li>
+            <li>กรุณา backup ข้อมูลปัจจุบันก่อน restore</li>
+            <li>การ restore ใน Production อาจส่งผลกระทบต่อผู้ใช้</li>
+        </ul>
+    </div>
+    
+    <form method="post" id="restore-form">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="field-box">
+                <label for="id_backup_file">ไฟล์ Backup:</label>
+                <select name="backup_file" id="id_backup_file" required>
+                    <option value="">-- เลือกไฟล์ Backup --</option>
+                    {% for file in local_files %}
+                    <option value="{{ file.path }}" data-env="local">{{ file.filename }} ({{ file.size_display }}) - Local</option>
+                    {% endfor %}
+                    {% for file in production_files %}
+                    <option value="{{ file.path }}" data-env="production">{{ file.filename }} ({{ file.size_display }}) - Production</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="field-box">
+                <label for="id_environment">Environment:</label>
+                <select name="environment" id="id_environment" required>
+                    <option value="">-- เลือก Environment --</option>
+                    <option value="local">Local</option>
+                    <option value="production">Production</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="field-box">
+                <label for="id_mode">โหมด Restore:</label>
+                <select name="mode" id="id_mode">
+                    <option value="safe">Safe (ปลอดภัย)</option>
+                    <option value="drop">Drop (ลบข้อมูลเดิม)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="confirmation-container" style="display: none;">
+            <div class="form-row">
+                <div class="field-box">
+                    <label for="id_confirmation">ยืนยันการ Restore:</label>
+                    <input type="text" name="confirmation" id="id_confirmation" placeholder="พิมพ์ข้อความยืนยัน" />
+                    <div id="confirmation-hint" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="field-box">
+                <button type="submit" id="restore-btn" class="default">เริ่ม Restore</button>
+                <a href="{% url 'admin:dbbackup_backuphistory_changelist' %}" class="button">ยกเลิก</a>
+            </div>
+        </div>
+    </form>
+    
+    <div id="restore-status" style="display: none; margin-top: 20px;">
+        <h3>สถานะการ Restore</h3>
+        <div id="restore-message"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('id_backup_file').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const environment = selectedOption.getAttribute('data-env');
+    const environmentSelect = document.getElementById('id_environment');
+    
+    if (environment) {
+        environmentSelect.value = environment;
+        updateConfirmation();
+    }
+});
+
+document.getElementById('id_mode').addEventListener('change', updateConfirmation);
+document.getElementById('id_environment').addEventListener('change', updateConfirmation);
+
+function updateConfirmation() {
+    const mode = document.getElementById('id_mode').value;
+    const environment = document.getElementById('id_environment').value;
+    const confirmationContainer = document.getElementById('confirmation-container');
+    const confirmationHint = document.getElementById('confirmation-hint');
+    
+    if (mode === 'drop' || environment === 'production') {
+        confirmationContainer.style.display = 'block';
+        
+        if (mode === 'drop' && environment === 'production') {
+            confirmationHint.textContent = 'พิมพ์ "RESTORE PRODUCTION" เพื่อยืนยัน';
+        } else if (mode === 'drop') {
+            confirmationHint.textContent = 'พิมพ์ "DROP" เพื่อยืนยัน';
+        } else if (environment === 'production') {
+            confirmationHint.textContent = 'พิมพ์ "RESTORE PRODUCTION" เพื่อยืนยัน';
+        }
+    } else {
+        confirmationContainer.style.display = 'none';
+    }
+}
+
+document.getElementById('restore-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const backupFile = document.getElementById('id_backup_file').value;
+    const environment = document.getElementById('id_environment').value;
+    const mode = document.getElementById('id_mode').value;
+    const confirmation = document.getElementById('id_confirmation').value;
+    const restoreBtn = document.getElementById('restore-btn');
+    const restoreStatus = document.getElementById('restore-status');
+    const restoreMessage = document.getElementById('restore-message');
+    
+    if (!backupFile || !environment) {
+        alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+        return;
+    }
+    
+    // Validate confirmation
+    if (mode === 'drop' && confirmation !== 'DROP') {
+        alert('กรุณาพิมพ์ DROP เพื่อยืนยัน');
+        return;
+    }
+    
+    if (environment === 'production' && confirmation !== 'RESTORE PRODUCTION') {
+        alert('กรุณาพิมพ์ RESTORE PRODUCTION เพื่อยืนยัน');
+        return;
+    }
+    
+    // Disable button and show status
+    restoreBtn.disabled = true;
+    restoreBtn.textContent = 'กำลัง Restore...';
+    restoreStatus.style.display = 'block';
+    restoreMessage.textContent = 'กำลัง restore database...';
+    
+    // Submit form
+    fetch('/admin/dbbackup/backuphistory/restore/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: new URLSearchParams({
+            'backup_file': backupFile,
+            'environment': environment,
+            'mode': mode,
+            'confirmation': confirmation
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            restoreMessage.innerHTML = '<span style="color: green;">✓ ' + data.message + '</span>';
+            setTimeout(() => {
+                window.location.href = '/admin/dbbackup/backuphistory/';
+            }, 3000);
+        } else {
+            restoreMessage.innerHTML = '<span style="color: red;">✗ ' + data.error + '</span>';
+            restoreBtn.disabled = false;
+            restoreBtn.textContent = 'เริ่ม Restore';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        restoreMessage.innerHTML = '<span style="color: red;">✗ เกิดข้อผิดพลาดในการส่งคำขอ</span>';
+        restoreBtn.disabled = false;
+        restoreBtn.textContent = 'เริ่ม Restore';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="/admin/dbbackup/backuphistory/backup/" class="addlink">
+            {% trans 'Backup Database' %}
+        </a>
+    </li>
+    <li>
+        <a href="/admin/dbbackup/backuphistory/restore/" class="addlink" style="background-color: #dc3545;">
+            {% trans 'Restore Database' %}
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}

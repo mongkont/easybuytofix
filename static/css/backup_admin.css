@@ -1,0 +1,202 @@
+/* Progress bar styling */
+.progress-bar {
+    width: 100%;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 5px 0;
+}
+
+.progress-bar .progress-fill {
+    background-color: #4CAF50;
+    height: 20px;
+    border-radius: 3px;
+    text-align: center;
+    color: white;
+    line-height: 20px;
+    transition: width 0.3s ease;
+}
+
+/* Backup/Restore form styling */
+.backup-form, .restore-form {
+    max-width: 600px;
+    margin: 20px 0;
+}
+
+.backup-form .form-row, .restore-form .form-row {
+    margin-bottom: 15px;
+}
+
+.backup-form .field-box, .restore-form .field-box {
+    margin-bottom: 10px;
+}
+
+.backup-form label, .restore-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.backup-form select, .restup-form select,
+.backup-form textarea, .restore-form textarea,
+.backup-form input, .restore-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.backup-form button, .restore-form button {
+    background-color: #417690;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.backup-form button:hover, .restore-form button:hover {
+    background-color: #205067;
+}
+
+.backup-form button:disabled, .restore-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Status indicators */
+.status-completed {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-failed {
+    color: #f44336;
+    font-weight: bold;
+}
+
+.status-in-progress {
+    color: #ff9800;
+    font-weight: bold;
+}
+
+/* Warning boxes */
+.warning-box {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 0;
+    color: #856404;
+}
+
+.warning-box strong {
+    color: #856404;
+}
+
+/* Confirmation styling */
+.confirmation-container {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.confirmation-hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* File size display */
+.file-size {
+    font-family: monospace;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Environment badges */
+.env-local {
+    background-color: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.env-production {
+    background-color: #dc3545;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* Backup type badges */
+.type-manual {
+    background-color: #17a2b8;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.type-scheduled {
+    background-color: #6c757d;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* Action buttons */
+.action-buttons {
+    margin: 10px 0;
+}
+
+.action-buttons .button {
+    margin-right: 10px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.action-buttons .button.download {
+    background-color: #28a745;
+    color: white;
+}
+
+.action-buttons .button.download:hover {
+    background-color: #218838;
+}
+
+.action-buttons .button.delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.action-buttons .button.delete:hover {
+    background-color: #c82333;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .backup-form, .restore-form {
+        max-width: 100%;
+    }
+    
+    .backup-form button, .restore-form button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

@@ -4,6 +4,9 @@
 .env.production
 .env.example
 
+# Backup files
+backups/
+
 # Python
 __pycache__/
 *.py[cod]

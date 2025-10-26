@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-89#q$)_guq3)ziy@(1839@q$#n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 
 
 # Application definition
@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'accounts',
     'products',
     'manuals',
+    'django_crontab',
+    'dbbackup',
 ]
 
 MIDDLEWARE = [
@@ -212,3 +214,17 @@ SUMMERNOTE_CONFIG = {
 
 # Custom upload path for Summernote
 SUMMERNOTE_UPLOAD_TO = 'manuals/images/%Y/%m/%d/'
+
+# Backup settings
+BACKUP_ROOT = os.path.join(BASE_DIR, 'backups')
+BACKUP_LOCAL_DIR = os.path.join(BACKUP_ROOT, 'local')
+BACKUP_PRODUCTION_DIR = os.path.join(BACKUP_ROOT, 'production')
+
+# Create directories
+os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
+os.makedirs(BACKUP_PRODUCTION_DIR, exist_ok=True)
+
+# Django Crontab settings
+CRONJOBS = [
+    ('*/1 * * * *', 'dbbackup.cron.run_scheduled_backups'),
+]
