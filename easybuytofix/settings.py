@@ -43,8 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'storages',
+    'django_summernote',
     'accounts',
     'products',
+    'manuals',
 ]
 
 MIDDLEWARE = [
@@ -178,3 +180,35 @@ else:
     # Local media files
     MEDIA_URL = os.getenv('MEDIA_URL', 'media/')
     MEDIA_ROOT = os.path.join(BASE_DIR, os.getenv('MEDIA_ROOT', 'media'))
+
+# Summernote Configuration
+SUMMERNOTE_CONFIG = {
+    'summernote': {
+        'toolbar': [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']],
+        ],
+        'width': '100%',
+        'height': '480',
+        'codemirror': {
+            'mode': 'htmlmixed',
+            'lineNumbers': 'true',
+            'theme': 'monokai',
+        },
+    },
+    'disable_attachment': False,
+    'attachment_require_authentication': True,
+    'attachment_filesize_limit': 10 * 1024 * 1024,  # 10MB
+    'attachment_model': 'manuals.ManualAttachment',
+}
+
+# Custom upload path for Summernote
+SUMMERNOTE_UPLOAD_TO = 'manuals/images/%Y/%m/%d/'

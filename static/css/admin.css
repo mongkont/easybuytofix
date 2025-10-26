@@ -1,334 +1,108 @@
-/* Custom CSS for Django Admin */
-
-/* Avatar styling with object-fit: cover - detail view (larger and rectangular) */
+/* Avatar styling for Django Admin */
 .avatar-preview img {
-    width: 200px !important;
-    height: 200px !important;
+    width: 60px !important;
+    height: 60px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+}
+
+/* Avatar preview in detail view - larger and rectangular */
+.change-form .avatar-preview img {
+    width: 120px !important;
+    height: 120px !important;
     object-fit: cover !important;
     border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
 }
 
-/* User profile inline styling */
-.inline-group .form-row .avatar-preview {
-    display: block;
-    margin-top: 10px;
-}
-
-/* Admin form styling - detail view */
-.form-row .field-avatar img {
-    max-width: 200px;
-    max-height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-/* Profile list styling */
-.field-avatar_preview img {
+/* Category image styling */
+.category-image-preview img {
     width: 50px !important;
     height: 50px !important;
     object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
+    border-radius: 4px !important;
 }
 
-/* Avatar in listview - make it smaller and circular */
-#result_list .field-avatar_preview img {
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* User listview avatar styling */
-#result_list .field-get_avatar_preview img {
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* Force all avatar images in listview to be circular and small */
-#result_list td img[src*="avatars/"] {
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* Specific targeting for profile picture column */
-#result_list .field-avatar_preview,
-#result_list .field-get_avatar_preview {
-    text-align: center !important;
-    width: 60px !important;
-}
-
-#result_list .field-avatar_preview img,
-#result_list .field-get_avatar_preview img {
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .avatar-preview img {
-        width: 80px !important;
-        height: 80px !important;
-    }
-    
-    .field-avatar_preview img {
-        width: 40px !important;
-        height: 40px !important;
-    }
-}
-
-/* Summernote styling for full width */
-.django-summernote-widget {
-    display: block !important;
-    width: 100% !important;
-}
-
-.django-summernote-widget .note-editor {
-    display: block !important;
-    width: 100% !important;
-}
-
-/* Form field styling */
-.field-phone_number input {
-    width: 100%;
-    max-width: 300px;
-}
-
-.field-bio textarea {
-    width: 100%;
-    min-height: 100px;
-}
-
-.field-address textarea {
-    width: 100%;
-    min-height: 80px;
-}
-
-/* Additional targeting for listview avatars - more specific selectors */
-#changelist .results table td img {
-    max-width: 30px !important;
-    max-height: 30px !important;
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* Target specific avatar columns in changelist */
-#changelist .results table .field-avatar_preview,
-#changelist .results table .field-get_avatar_preview {
-    width: 60px !important;
-    text-align: center !important;
-}
-
-#changelist .results table .field-avatar_preview img,
-#changelist .results table .field-get_avatar_preview img {
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* Force all images in result list to be small and circular */
-#result_list img {
-    max-width: 30px !important;
-    max-height: 30px !important;
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* Category image styling - 1:1 aspect ratio */
-.category-image-preview img {
+/* Category image preview in detail view - 1:1 aspect ratio */
+.change-form .category-image-preview img {
     width: 200px !important;
     height: 200px !important;
     object-fit: cover !important;
     border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
 }
 
-/* OG Image styling - 16:9 aspect ratio */
+/* OG Image preview - 16:9 aspect ratio */
 .og-image-preview img {
-    width: 320px !important;
-    height: 180px !important;
+    width: 200px !important;
+    height: 112px !important;
     object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
+    border-radius: 4px !important;
 }
 
-/* Category image in listview - square */
-#result_list .field-image_preview img {
+/* Brand logo styling */
+.brand-logo-preview img {
     width: 50px !important;
     height: 50px !important;
     object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
+    border-radius: 4px !important;
 }
 
-/* Force category images to display properly */
-#content .category-image-preview img,
-.change-form .category-image-preview img,
-.form-row .category-image-preview img {
+/* Brand logo preview in detail view - 1:1 aspect ratio */
+.change-form .brand-logo-preview img {
     width: 200px !important;
     height: 200px !important;
     object-fit: cover !important;
     border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
 }
 
-/* Ensure category images load properly */
-.category-image-preview {
+/* Summernote simple full width styling */
+.django-summernote-widget {
+    width: 100% !important;
     display: block !important;
-    margin: 10px 0 !important;
 }
 
-.category-image-preview img {
-    max-width: 200px !important;
-    max-height: 200px !important;
-    width: 200px !important;
-    height: 200px !important;
+.note-editor {
+    width: 100% !important;
+    display: block !important;
+}
+
+.note-editable {
+    width: 100% !important;
+    display: block !important;
+    min-height: 400px !important;
+}
+
+.note-toolbar {
+    width: 100% !important;
+    display: block !important;
+}
+
+/* Keep toolbar buttons inline */
+.note-toolbar .note-btn,
+.note-toolbar .note-btn-group {
+    display: inline-block !important;
+}
+
+/* Force flex-container to display block */
+.flex-container {
+    display: block !important;
+}
+
+/* Override any flex properties on Summernote containers */
+.django-summernote-widget,
+.note-editor,
+.note-toolbar,
+.note-editable {
+    display: block !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    align-items: unset !important;
+    justify-content: unset !important;
+}
+
+/* Manual attachment preview styling */
+.field-file_preview img {
+    max-width: 100px !important;
+    max-height: 100px !important;
     object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-/* Fix image display in admin forms */
-.form-row .field-image_with_delete_button,
-.form-row .field-og_image_with_delete_button {
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-.form-row .field-image_with_delete_button .category-image-preview,
-.form-row .field-og_image_with_delete_button .category-image-preview {
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-/* Detail view avatar styling - larger and rectangular */
-#content .avatar-preview img,
-.change-form .avatar-preview img,
-.form-row .avatar-preview img {
-    width: 200px !important;
-    height: 200px !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-/* Ensure detail view avatars are not circular */
-#content .avatar-preview img,
-.change-form .avatar-preview img,
-.form-row .avatar-preview img {
-    border-radius: 8px !important;
-}
-
-/* Brand logo styling - 1:1 aspect ratio */
-.brand-logo-preview img {
-    width: 200px !important;
-    height: 200px !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-/* Brand logo in listview - square */
-#result_list .field-logo_preview img {
-    width: 50px !important;
-    height: 50px !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 1px solid #ddd !important;
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-/* Force brand logos to display properly */
-#content .brand-logo-preview img,
-.change-form .brand-logo-preview img,
-.form-row .brand-logo-preview img {
-    width: 200px !important;
-    height: 200px !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-/* Ensure brand logos load properly */
-.brand-logo-preview {
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-.brand-logo-preview img {
-    max-width: 200px !important;
-    max-height: 200px !important;
-    width: 200px !important;
-    height: 200px !important;
-    object-fit: cover !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-/* Fix image display in admin forms */
-.form-row .field-logo_with_delete_button,
-.form-row .field-og_image_with_delete_button {
-    display: block !important;
-    margin: 10px 0 !important;
-}
-
-.form-row .field-logo_with_delete_button .brand-logo-preview,
-.form-row .field-og_image_with_delete_button .brand-logo-preview {
-    display: block !important;
-    margin: 10px 0 !important;
+    border-radius: 4px !important;
 }
